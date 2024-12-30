@@ -1,50 +1,103 @@
-<div style="margin: 16px 32px">
-  <h3>Flights from Bengaluru to Amsterdam</h3>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="container bg-white p-6 rounded shadow-md w-full max-w-lg">
+        <h2 class="text-2xl font-bold text-center mb-6">Registration Form</h2>
+        <form id="registrationForm" class="space-y-4">
+            <div class="form-group">
+                <label for="name" class="block text-gray-700">Name:</label>
+                <input type="text" id="name" required
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-green-300">
+            </div>
+            <div class="form-group">
+                <label for="email" class="block text-gray-700">Email:</label>
+                <input type="email" id="email" required
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-green-300">
+            </div>
+            <div class="form-group">
+                <label for="password" class="block text-gray-700">Password:</label>
+                <input type="password" id="password" required
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-green-300">
+            </div>
+            <div class="form-group">
+                <label for="dob" class="block text-gray-700">Date of Birth:</label>
+                <input type="date" id="dob" required
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-green-300">
+            </div>
+            <div class="form-group flex items-center">
+                <input type="checkbox" id="terms" required
+                    class="mr-2 focus:outline-none focus:ring focus:ring-green-300">
+                <label for="terms" class="text-gray-700">I agree to the terms and conditions</label>
+            </div>
+            <button type="submit"
+                class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">Register</button>
+        </form>
+        <table class="entries w-full mt-6 border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border px-4 py-2">Name</th>
+                    <th class="border px-4 py-2">Email</th>
+                    <th class="border px-4 py-2">Password</th>
+                    <th class="border px-4 py-2">Date of Birth</th>
+                    <th class="border px-4 py-2">Accept Terms</th>
+                </tr>
+            </thead>
+            <tbody id="entriesBody" class="bg-white">
+                <!-- Entries will be populated here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        // Set the maximum allowed date for the date picker to today's date
+        document.getElementById('dob').max = new Date().toISOString().split('T')[0];
 
-  <ul id="flights"></ul>
+        // Function to populate the table with data from local storage
+        function populateTable() {
+            const entriesBody = document.getElementById('entriesBody');
+            entriesBody.innerHTML = ''; // Clear existing rows
+            const entries = JSON.parse(localStorage.getItem('entries')) || [];
+            entries.forEach(entry => {
+                const newRow = entriesBody.insertRow();
+                newRow.insertCell(0).textContent = entry.name;
+                newRow.insertCell(1).textContent = entry.email;
+                newRow.insertCell(2).textContent = entry.password;
+                newRow.insertCell(3).textContent = entry.dob;
+                newRow.insertCell(4).textContent = entry.acceptTerms ? 'Yes' : 'No';
+            });
+        }
 
-  <div style="display: flex">
-    <!-- 1 stop -->
-    <input type="checkbox" id="stops-1" style="margin-right: 8px" />
-    <label for="stops-1" onclick="toggleStop('one')">1 stop</label>
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const dob = document.getElementById('dob').value;
+            const acceptTerms = document.getElementById('terms').checked;
 
-    <!-- 2 stops -->
-    <input type="checkbox" id="stops-2" style="margin-left: 16px; margin-right: 8px" />
-    <label for="stops-2" onclick="toggleStop('two')">2 stops</label>
-  </div>
-</div>
+            // Get existing entries from local storage
+            const entries = JSON.parse(localStorage.getItem('entries')) || [];
 
-<script>
-  let flights = [
-    { airline: "Air India", stops: 0 },
-    { airline: "SriLankan Airlines", stops: 2 },
-    { airline: "British Airways", stops: 1 },
-    { airline: "Etihad Airways", stops: 1 },
-    { airline: "Thai Airways", stops: 2 },
-    { airline: "Singapore Air", stops: 2 },
-    { airline: "Air France", stops: 2 },
-    { airline: "Qatar Airways", stops: 1 },
-    { airline: "Lufthansa", stops: 1 },
-  ]
+            // Add new entry to the list
+            entries.push({ name, email, password, dob, acceptTerms });
 
-  // Event Handling
-  let selectedStops = { one: false, two: false };
+            // Save updated entries back to local storage
+            localStorage.setItem('entries', JSON.stringify(entries));
 
-  let toggleStop = (key) => {
-    selectedStops[key] = !selectedStops[key];
-    render();
-  };
+            // Repopulate the table
+            populateTable();
 
-  // View
-  let createListItem = (item) => "<li>" + item.airline + "</li>";
+            // Reset the form
+            this.reset();
+        });
 
-  let htmlView = (items) => items.map(createListItem).join("\n");
-
-  let render = () => {
-    let view = htmlView(flights);
-
-    document.getElementById("flights").innerHTML = view;
-  };
-
-  render();
-</script>
+        // Populate the table on page load
+        populateTable();
+    </script>
+</body>
+</html>
